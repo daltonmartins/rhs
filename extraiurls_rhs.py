@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[53]:
+# In[55]:
 
 
 from bs4 import BeautifulSoup
@@ -16,7 +16,7 @@ cur = conn.cursor()
 # consulta ao banco de dados
 # coleta os textos da tabela field_data_body
 # coleta os metadados do texto da tabela node
-cur.execute("SELECT f.body_value,f.entity_id,n.uid,u.name FROM field_data_body f INNER JOIN node n ON f.entity_id=n.nid JOIN users u ON n.uid=u.uid WHERE f.bundle='blog'")
+cur.execute("SELECT f.body_value,f.entity_id,n.uid,u.name,from_unixtime(n.created) FROM field_data_body f INNER JOIN node n ON f.entity_id=n.nid JOIN users u ON n.uid=u.uid WHERE f.bundle='blog'")
 
 
 #laço para busca dos links da rede
@@ -30,6 +30,7 @@ for row in cur:
         listaInterna.append(row[1])
         listaInterna.append(row[2])
         listaInterna.append(row[3])
+        listaInterna.append(row[4])
         listaParaGerarCsv.append(listaInterna)
 
         
@@ -40,7 +41,7 @@ conn.close()
     
 with open('listagem_links_rhs.csv', 'w') as csvfile:
     spamwriter = csv.writer(csvfile, delimiter=';', quotechar='"',quoting=csv.QUOTE_MINIMAL)
-    spamwriter.writerow(['Link', 'No', 'NID','Usuario'])
+    spamwriter.writerow(['Link', 'No', 'NID','Usuario','Timestamp'])
     for linha in listaParaGerarCsv:
         spamwriter.writerow(linha)          
 
